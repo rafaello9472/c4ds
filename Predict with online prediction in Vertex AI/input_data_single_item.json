@@ -1,0 +1,10 @@
+{"instances": [{"gender": "Female",
+                "age": "45.0",
+                "hypertension": "0",
+                "heart_disease": "0",
+                "ever_married": "Yes",
+                "work_type": "Private",
+                "Residence_type": "Urban",
+                "avg_glucose_level": "91.9",
+                "bmi": "28.1",
+                "smoking_status": "never smoked"}]}
