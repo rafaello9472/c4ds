@@ -2,7 +2,6 @@
 import os, joblib, logging, argparse
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from google.cloud import storage
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
@@ -12,7 +11,6 @@ from sklearn.metrics import roc_curve
 # Setup logging and parser
 logging.basicConfig(level=logging.INFO)
 parser = argparse.ArgumentParser()
-
 
 # Input Arguments
 parser.add_argument(
@@ -25,7 +23,7 @@ parser.add_argument(
 args = parser.parse_args()
 arguments = args.__dict__
 
-# Get dataset from GCS
+# Get dataset from GCS (You can also use dataset from BigQuery or from Vertex AI managed datasets)
 # data_gcs_path = 'gs://datasets-c4ds/healthcare-dataset-stroke-data.csv'
 data_gcs_path = arguments['data_gcs_path']
 df = pd.read_csv(data_gcs_path)
@@ -50,34 +48,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random
 print('Training a decision tree model...')
 model = DecisionTreeClassifier().fit(X_train, y_train)
 
-# # calculate accuracy
-# y_hat = model.predict(X_test)
-# acc = np.average(y_hat == y_test)
-# print('Accuracy:', acc)
-# # run.log('Accuracy', np.float(acc))
-
-# # calculate AUC
-# y_scores = model.predict_proba(X_test)
-# auc = roc_auc_score(y_test,y_scores[:,1])
-# print('AUC: ' + str(auc))
-# # run.log('AUC', np.float(auc))
-
-# # plot ROC curve
-# fpr, tpr, thresholds = roc_curve(y_test, y_scores[:,1])
-# fig = plt.figure(figsize=(6, 4))
-# # Plot the diagonal 50% line
-# plt.plot([0, 1], [0, 1], 'k--')
-# # Plot the FPR and TPR achieved by our model
-# plt.plot(fpr, tpr)
-# plt.xlabel('False Positive Rate')
-# plt.ylabel('True Positive Rate')
-# plt.title('ROC Curve')
-# # run.log_image(name = "ROC", plot = fig)
-# plt.show()
-
-artifact_filename = 'model.joblib'
-
 # Save model artifact to local filesystem (doesn't persist)
+artifact_filename = 'model.joblib'
 local_path = artifact_filename
 joblib.dump(model, local_path)
 

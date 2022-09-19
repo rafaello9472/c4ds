@@ -9,6 +9,5 @@ COPY c4ds/Custom training job in Vertex AI/Custom container/requirements.txt /ro
 # 3. Install dependencies
 RUN pip install -r /root/requirements.txt
 
-
 # 4. Sets up the entry point to invoke the trainer.
 ENTRYPOINT ["python", "task.py"]

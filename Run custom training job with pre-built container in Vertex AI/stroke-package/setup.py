@@ -1,7 +1,7 @@
 from setuptools import find_packages
 from setuptools import setup
 
-REQUIRED_PACKAGES = ['matplotlib','gcsfs>=2021.4.0']
+REQUIRED_PACKAGES = ['gcsfs>=2021.4.0']
 
 setup(
     name='trainer',
