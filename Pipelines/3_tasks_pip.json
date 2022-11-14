@@ -1,0 +1,247 @@
+{
+  "pipelineSpec": {
+    "components": {
+      "comp-add": {
+        "executorLabel": "exec-add",
+        "inputDefinitions": {
+          "parameters": {
+            "a": {
+              "type": "DOUBLE"
+            },
+            "b": {
+              "type": "DOUBLE"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "Output": {
+              "type": "DOUBLE"
+            }
+          }
+        }
+      },
+      "comp-add-2": {
+        "executorLabel": "exec-add-2",
+        "inputDefinitions": {
+          "parameters": {
+            "a": {
+              "type": "DOUBLE"
+            },
+            "b": {
+              "type": "DOUBLE"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "Output": {
+              "type": "DOUBLE"
+            }
+          }
+        }
+      },
+      "comp-multiple-return-values-example": {
+        "executorLabel": "exec-multiple-return-values-example",
+        "inputDefinitions": {
+          "parameters": {
+            "a": {
+              "type": "DOUBLE"
+            },
+            "b": {
+              "type": "DOUBLE"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "product": {
+              "type": "DOUBLE"
+            },
+            "sum": {
+              "type": "DOUBLE"
+            }
+          }
+        }
+      }
+    },
+    "deploymentSpec": {
+      "executors": {
+        "exec-add": {
+          "container": {
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "add"
+            ],
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.14' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef add(a: float, b: float) -> float:\n  '''Calculates sum of two arguments'''\n  return a + b\n\n"
+            ],
+            "image": "python:3.7"
+          }
+        },
+        "exec-add-2": {
+          "container": {
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "add"
+            ],
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.14' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef add(a: float, b: float) -> float:\n  '''Calculates sum of two arguments'''\n  return a + b\n\n"
+            ],
+            "image": "python:3.7"
+          }
+        },
+        "exec-multiple-return-values-example": {
+          "container": {
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "multiple_return_values_example"
+            ],
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.14' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef multiple_return_values_example(a: float, b: float) -> NamedTuple(\n  'ExampleOutputs',\n  [\n    ('sum', float),\n    ('product', float)\n  ]):\n    \"\"\"Example function that demonstrates how to return multiple values.\"\"\"  \n    sum_value = a + b\n    product_value = a * b\n\n    from collections import namedtuple\n    example_output = namedtuple('ExampleOutputs', ['sum', 'product'])\n    return example_output(sum_value, product_value)\n\n"
+            ],
+            "image": "python:3.7"
+          }
+        }
+      }
+    },
+    "pipelineInfo": {
+      "name": "multiple-outputs-pipeline"
+    },
+    "root": {
+      "dag": {
+        "tasks": {
+          "add": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-add"
+            },
+            "dependentTasks": [
+              "multiple-return-values-example"
+            ],
+            "inputs": {
+              "parameters": {
+                "a": {
+                  "taskOutputParameter": {
+                    "outputParameterKey": "sum",
+                    "producerTask": "multiple-return-values-example"
+                  }
+                },
+                "b": {
+                  "componentInputParameter": "b"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "add"
+            }
+          },
+          "add-2": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-add-2"
+            },
+            "dependentTasks": [
+              "multiple-return-values-example"
+            ],
+            "inputs": {
+              "parameters": {
+                "a": {
+                  "taskOutputParameter": {
+                    "outputParameterKey": "product",
+                    "producerTask": "multiple-return-values-example"
+                  }
+                },
+                "b": {
+                  "componentInputParameter": "b"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "add-2"
+            }
+          },
+          "multiple-return-values-example": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-multiple-return-values-example"
+            },
+            "inputs": {
+              "parameters": {
+                "a": {
+                  "componentInputParameter": "a"
+                },
+                "b": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "4"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "multiple-return-values-example"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "a": {
+            "type": "DOUBLE"
+          },
+          "b": {
+            "type": "DOUBLE"
+          },
+          "project_id": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    "schemaVersion": "2.0.0",
+    "sdkVersion": "kfp-1.8.14"
+  },
+  "runtimeConfig": {
+    "gcsOutputDirectory": "gs://c4ds/vertexai/pipelines",
+    "parameters": {
+      "a": {
+        "doubleValue": 4.0
+      },
+      "b": {
+        "doubleValue": 6.0
+      }
+    }
+  }
+}

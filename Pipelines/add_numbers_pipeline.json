@@ -1,0 +1,171 @@
+{
+  "pipelineSpec": {
+    "components": {
+      "comp-add": {
+        "executorLabel": "exec-add",
+        "inputDefinitions": {
+          "parameters": {
+            "a": {
+              "type": "DOUBLE"
+            },
+            "b": {
+              "type": "DOUBLE"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "Output": {
+              "type": "DOUBLE"
+            }
+          }
+        }
+      },
+      "comp-add-2": {
+        "executorLabel": "exec-add-2",
+        "inputDefinitions": {
+          "parameters": {
+            "a": {
+              "type": "DOUBLE"
+            },
+            "b": {
+              "type": "DOUBLE"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "Output": {
+              "type": "DOUBLE"
+            }
+          }
+        }
+      }
+    },
+    "deploymentSpec": {
+      "executors": {
+        "exec-add": {
+          "container": {
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "add"
+            ],
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.14' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef add(a: float, b: float) -> float:\n  '''Calculates sum of two arguments'''\n  return a + b\n\n"
+            ],
+            "image": "python:3.7"
+          }
+        },
+        "exec-add-2": {
+          "container": {
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "add"
+            ],
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.14' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef add(a: float, b: float) -> float:\n  '''Calculates sum of two arguments'''\n  return a + b\n\n"
+            ],
+            "image": "python:3.7"
+          }
+        }
+      }
+    },
+    "pipelineInfo": {
+      "name": "addition-pipeline"
+    },
+    "root": {
+      "dag": {
+        "tasks": {
+          "add": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-add"
+            },
+            "inputs": {
+              "parameters": {
+                "a": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "1"
+                    }
+                  }
+                },
+                "b": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "4"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "add"
+            }
+          },
+          "add-2": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-add-2"
+            },
+            "dependentTasks": [
+              "add"
+            ],
+            "inputs": {
+              "parameters": {
+                "a": {
+                  "taskOutputParameter": {
+                    "outputParameterKey": "Output",
+                    "producerTask": "add"
+                  }
+                },
+                "b": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "2"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "add-2"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "project_id": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    "schemaVersion": "2.0.0",
+    "sdkVersion": "kfp-1.8.14"
+  },
+  "runtimeConfig": {
+    "gcsOutputDirectory": "gs://c4ds/vertexai/pipelines"
+  }
+}

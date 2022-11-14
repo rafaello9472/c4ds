@@ -1,0 +1,740 @@
+{
+  "pipelineSpec": {
+    "components": {
+      "comp-automl-image-training-job": {
+        "executorLabel": "exec-automl-image-training-job",
+        "inputDefinitions": {
+          "artifacts": {
+            "dataset": {
+              "artifactType": {
+                "schemaTitle": "google.VertexDataset",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          },
+          "parameters": {
+            "budget_milli_node_hours": {
+              "type": "INT"
+            },
+            "disable_early_stopping": {
+              "type": "STRING"
+            },
+            "display_name": {
+              "type": "STRING"
+            },
+            "labels": {
+              "type": "STRING"
+            },
+            "location": {
+              "type": "STRING"
+            },
+            "model_display_name": {
+              "type": "STRING"
+            },
+            "model_type": {
+              "type": "STRING"
+            },
+            "multi_label": {
+              "type": "STRING"
+            },
+            "prediction_type": {
+              "type": "STRING"
+            },
+            "project": {
+              "type": "STRING"
+            },
+            "test_fraction_split": {
+              "type": "DOUBLE"
+            },
+            "training_fraction_split": {
+              "type": "DOUBLE"
+            },
+            "validation_fraction_split": {
+              "type": "DOUBLE"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "model": {
+              "artifactType": {
+                "schemaTitle": "google.VertexModel",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      },
+      "comp-endpoint-create": {
+        "executorLabel": "exec-endpoint-create",
+        "inputDefinitions": {
+          "parameters": {
+            "description": {
+              "type": "STRING"
+            },
+            "display_name": {
+              "type": "STRING"
+            },
+            "encryption_spec_key_name": {
+              "type": "STRING"
+            },
+            "labels": {
+              "type": "STRING"
+            },
+            "location": {
+              "type": "STRING"
+            },
+            "network": {
+              "type": "STRING"
+            },
+            "project": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "endpoint": {
+              "artifactType": {
+                "schemaTitle": "google.VertexEndpoint",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          },
+          "parameters": {
+            "gcp_resources": {
+              "type": "STRING"
+            }
+          }
+        }
+      },
+      "comp-image-dataset-create": {
+        "executorLabel": "exec-image-dataset-create",
+        "inputDefinitions": {
+          "parameters": {
+            "data_item_labels": {
+              "type": "STRING"
+            },
+            "display_name": {
+              "type": "STRING"
+            },
+            "gcs_source": {
+              "type": "STRING"
+            },
+            "import_schema_uri": {
+              "type": "STRING"
+            },
+            "labels": {
+              "type": "STRING"
+            },
+            "location": {
+              "type": "STRING"
+            },
+            "project": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "dataset": {
+              "artifactType": {
+                "schemaTitle": "google.VertexDataset",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      },
+      "comp-model-deploy": {
+        "executorLabel": "exec-model-deploy",
+        "inputDefinitions": {
+          "artifacts": {
+            "endpoint": {
+              "artifactType": {
+                "schemaTitle": "google.VertexEndpoint",
+                "schemaVersion": "0.0.1"
+              }
+            },
+            "model": {
+              "artifactType": {
+                "schemaTitle": "google.VertexModel",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          },
+          "parameters": {
+            "automatic_resources_max_replica_count": {
+              "type": "INT"
+            },
+            "automatic_resources_min_replica_count": {
+              "type": "INT"
+            },
+            "dedicated_resources_accelerator_count": {
+              "type": "INT"
+            },
+            "dedicated_resources_accelerator_type": {
+              "type": "STRING"
+            },
+            "dedicated_resources_machine_type": {
+              "type": "STRING"
+            },
+            "dedicated_resources_max_replica_count": {
+              "type": "INT"
+            },
+            "dedicated_resources_min_replica_count": {
+              "type": "INT"
+            },
+            "deployed_model_display_name": {
+              "type": "STRING"
+            },
+            "disable_container_logging": {
+              "type": "STRING"
+            },
+            "enable_access_logging": {
+              "type": "STRING"
+            },
+            "explanation_metadata": {
+              "type": "STRING"
+            },
+            "explanation_parameters": {
+              "type": "STRING"
+            },
+            "service_account": {
+              "type": "STRING"
+            },
+            "traffic_split": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "gcp_resources": {
+              "type": "STRING"
+            }
+          }
+        }
+      }
+    },
+    "deploymentSpec": {
+      "executors": {
+        "exec-automl-image-training-job": {
+          "container": {
+            "args": [
+              "--init.project",
+              "{{$.inputs.parameters['project']}}",
+              "--init.location",
+              "{{$.inputs.parameters['location']}}",
+              "--init.display_name",
+              "{{$.inputs.parameters['display_name']}}",
+              "--init.prediction_type",
+              "{{$.inputs.parameters['prediction_type']}}",
+              "--init.multi_label",
+              "{{$.inputs.parameters['multi_label']}}",
+              "--init.model_type",
+              "{{$.inputs.parameters['model_type']}}",
+              "--init.labels",
+              "{{$.inputs.parameters['labels']}}",
+              "--method.dataset",
+              "{{$.inputs.artifacts['dataset'].metadata['resourceName']}}",
+              "--method.disable_early_stopping",
+              "{{$.inputs.parameters['disable_early_stopping']}}",
+              "--method.model_display_name",
+              "{{$.inputs.parameters['model_display_name']}}",
+              "--method.training_fraction_split",
+              "{{$.inputs.parameters['training_fraction_split']}}",
+              "--method.validation_fraction_split",
+              "{{$.inputs.parameters['validation_fraction_split']}}",
+              "--method.test_fraction_split",
+              "{{$.inputs.parameters['test_fraction_split']}}",
+              "--method.budget_milli_node_hours",
+              "{{$.inputs.parameters['budget_milli_node_hours']}}",
+              "--executor_input",
+              "{{$}}",
+              "--resource_name_output_artifact_uri",
+              "{{$.outputs.artifacts['model'].uri}}"
+            ],
+            "command": [
+              "python3",
+              "-m",
+              "google_cloud_pipeline_components.container.aiplatform.remote_runner",
+              "--cls_name",
+              "AutoMLImageTrainingJob",
+              "--method_name",
+              "run"
+            ],
+            "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.26"
+          }
+        },
+        "exec-endpoint-create": {
+          "container": {
+            "args": [
+              "--type",
+              "CreateEndpoint",
+              "--payload",
+              "{\"display_name\": \"{{$.inputs.parameters['display_name']}}\", \"description\": \"{{$.inputs.parameters['description']}}\", \"labels\": {{$.inputs.parameters['labels']}}, \"encryption_spec\": {\"kms_key_name\":\"{{$.inputs.parameters['encryption_spec_key_name']}}\"}, \"network\": \"{{$.inputs.parameters['network']}}\"}",
+              "--project",
+              "{{$.inputs.parameters['project']}}",
+              "--location",
+              "{{$.inputs.parameters['location']}}",
+              "--gcp_resources",
+              "{{$.outputs.parameters['gcp_resources'].output_file}}",
+              "--executor_input",
+              "{{$}}"
+            ],
+            "command": [
+              "python3",
+              "-u",
+              "-m",
+              "google_cloud_pipeline_components.container.v1.endpoint.create_endpoint.launcher"
+            ],
+            "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.26"
+          }
+        },
+        "exec-image-dataset-create": {
+          "container": {
+            "args": [
+              "--method.project",
+              "{{$.inputs.parameters['project']}}",
+              "--method.location",
+              "{{$.inputs.parameters['location']}}",
+              "--method.display_name",
+              "{{$.inputs.parameters['display_name']}}",
+              "--method.data_item_labels",
+              "{{$.inputs.parameters['data_item_labels']}}",
+              "--method.gcs_source",
+              "{{$.inputs.parameters['gcs_source']}}",
+              "--method.import_schema_uri",
+              "{{$.inputs.parameters['import_schema_uri']}}",
+              "--method.labels",
+              "{{$.inputs.parameters['labels']}}",
+              "--executor_input",
+              "{{$}}",
+              "--resource_name_output_artifact_uri",
+              "{{$.outputs.artifacts['dataset'].uri}}"
+            ],
+            "command": [
+              "python3",
+              "-m",
+              "google_cloud_pipeline_components.container.aiplatform.remote_runner",
+              "--cls_name",
+              "ImageDataset",
+              "--method_name",
+              "create"
+            ],
+            "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.26"
+          }
+        },
+        "exec-model-deploy": {
+          "container": {
+            "args": [
+              "--type",
+              "DeployModel",
+              "--payload",
+              "{\"endpoint\": \"{{$.inputs.artifacts['endpoint'].metadata['resourceName']}}\", \"traffic_split\": {{$.inputs.parameters['traffic_split']}}, \"deployed_model\": {\"model\": \"{{$.inputs.artifacts['model'].metadata['resourceName']}}\", \"dedicated_resources\": {\"machine_spec\": {\"machine_type\": \"{{$.inputs.parameters['dedicated_resources_machine_type']}}\", \"accelerator_type\": \"{{$.inputs.parameters['dedicated_resources_accelerator_type']}}\", \"accelerator_count\": {{$.inputs.parameters['dedicated_resources_accelerator_count']}}}, \"min_replica_count\": {{$.inputs.parameters['dedicated_resources_min_replica_count']}}, \"max_replica_count\": {{$.inputs.parameters['dedicated_resources_max_replica_count']}}}, \"automatic_resources\": {\"min_replica_count\": {{$.inputs.parameters['automatic_resources_min_replica_count']}}, \"max_replica_count\": {{$.inputs.parameters['automatic_resources_max_replica_count']}}}, \"service_account\": \"{{$.inputs.parameters['service_account']}}\", \"disable_container_logging\": {{$.inputs.parameters['disable_container_logging']}}, \"enable_access_logging\": {{$.inputs.parameters['enable_access_logging']}}, \"explanation_spec\": {\"parameters\": {{$.inputs.parameters['explanation_parameters']}}, \"metadata\": {{$.inputs.parameters['explanation_metadata']}}}}}",
+              "--project",
+              "",
+              "--location",
+              "",
+              "--gcp_resources",
+              "{{$.outputs.parameters['gcp_resources'].output_file}}"
+            ],
+            "command": [
+              "python3",
+              "-u",
+              "-m",
+              "google_cloud_pipeline_components.container.v1.endpoint.deploy_model.launcher"
+            ],
+            "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.26"
+          }
+        }
+      }
+    },
+    "pipelineInfo": {
+      "name": "automl-image-training-v2"
+    },
+    "root": {
+      "dag": {
+        "tasks": {
+          "automl-image-training-job": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-automl-image-training-job"
+            },
+            "dependentTasks": [
+              "image-dataset-create"
+            ],
+            "inputs": {
+              "artifacts": {
+                "dataset": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "dataset",
+                    "producerTask": "image-dataset-create"
+                  }
+                }
+              },
+              "parameters": {
+                "budget_milli_node_hours": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "8000"
+                    }
+                  }
+                },
+                "disable_early_stopping": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "0"
+                    }
+                  }
+                },
+                "display_name": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "train-iris-automl-mbsdk-1"
+                    }
+                  }
+                },
+                "labels": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "{}"
+                    }
+                  }
+                },
+                "location": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "us-central1"
+                    }
+                  }
+                },
+                "model_display_name": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "iris-classification-model-mbsdk"
+                    }
+                  }
+                },
+                "model_type": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "CLOUD"
+                    }
+                  }
+                },
+                "multi_label": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "0"
+                    }
+                  }
+                },
+                "prediction_type": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "classification"
+                    }
+                  }
+                },
+                "project": {
+                  "componentInputParameter": "project_id"
+                },
+                "test_fraction_split": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "doubleValue": 0.2
+                    }
+                  }
+                },
+                "training_fraction_split": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "doubleValue": 0.6
+                    }
+                  }
+                },
+                "validation_fraction_split": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "doubleValue": 0.2
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "automl-image-training-job"
+            }
+          },
+          "endpoint-create": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-endpoint-create"
+            },
+            "inputs": {
+              "parameters": {
+                "description": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "display_name": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "create-endpoint"
+                    }
+                  }
+                },
+                "encryption_spec_key_name": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "labels": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "{}"
+                    }
+                  }
+                },
+                "location": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "us-central1"
+                    }
+                  }
+                },
+                "network": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "project": {
+                  "componentInputParameter": "project_id"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "endpoint-create"
+            }
+          },
+          "image-dataset-create": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-image-dataset-create"
+            },
+            "inputs": {
+              "parameters": {
+                "data_item_labels": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "{}"
+                    }
+                  }
+                },
+                "display_name": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "flowers"
+                    }
+                  }
+                },
+                "gcs_source": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "gs://cloud-samples-data/vision/automl_classification/flowers/all_data_v2.csv"
+                    }
+                  }
+                },
+                "import_schema_uri": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "gs://google-cloud-aiplatform/schema/dataset/ioformat/image_classification_single_label_io_format_1.0.0.yaml"
+                    }
+                  }
+                },
+                "labels": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "{}"
+                    }
+                  }
+                },
+                "location": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "us-central1"
+                    }
+                  }
+                },
+                "project": {
+                  "componentInputParameter": "project_id"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "image-dataset-create"
+            }
+          },
+          "model-deploy": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-model-deploy"
+            },
+            "dependentTasks": [
+              "automl-image-training-job",
+              "endpoint-create"
+            ],
+            "inputs": {
+              "artifacts": {
+                "endpoint": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "endpoint",
+                    "producerTask": "endpoint-create"
+                  }
+                },
+                "model": {
+                  "taskOutputArtifact": {
+                    "outputArtifactKey": "model",
+                    "producerTask": "automl-image-training-job"
+                  }
+                }
+              },
+              "parameters": {
+                "automatic_resources_max_replica_count": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "1"
+                    }
+                  }
+                },
+                "automatic_resources_min_replica_count": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "1"
+                    }
+                  }
+                },
+                "dedicated_resources_accelerator_count": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "0"
+                    }
+                  }
+                },
+                "dedicated_resources_accelerator_type": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "dedicated_resources_machine_type": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "dedicated_resources_max_replica_count": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "0"
+                    }
+                  }
+                },
+                "dedicated_resources_min_replica_count": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "0"
+                    }
+                  }
+                },
+                "deployed_model_display_name": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "disable_container_logging": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "0"
+                    }
+                  }
+                },
+                "enable_access_logging": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "intValue": "0"
+                    }
+                  }
+                },
+                "explanation_metadata": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "{}"
+                    }
+                  }
+                },
+                "explanation_parameters": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "{}"
+                    }
+                  }
+                },
+                "service_account": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": ""
+                    }
+                  }
+                },
+                "traffic_split": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "{}"
+                    }
+                  }
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "model-deploy"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "project_id": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    "schemaVersion": "2.0.0",
+    "sdkVersion": "kfp-1.8.14"
+  },
+  "runtimeConfig": {
+    "gcsOutputDirectory": "gs://c4ds/vertexai/pipelines"
+  }
+}

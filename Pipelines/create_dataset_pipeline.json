@@ -1,0 +1,148 @@
+{
+  "pipelineSpec": {
+    "components": {
+      "comp-tabular-dataset-create": {
+        "executorLabel": "exec-tabular-dataset-create",
+        "inputDefinitions": {
+          "parameters": {
+            "display_name": {
+              "type": "STRING"
+            },
+            "gcs_source": {
+              "type": "STRING"
+            },
+            "labels": {
+              "type": "STRING"
+            },
+            "location": {
+              "type": "STRING"
+            },
+            "project": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "artifacts": {
+            "dataset": {
+              "artifactType": {
+                "schemaTitle": "google.VertexDataset",
+                "schemaVersion": "0.0.1"
+              }
+            }
+          }
+        }
+      }
+    },
+    "deploymentSpec": {
+      "executors": {
+        "exec-tabular-dataset-create": {
+          "container": {
+            "args": [
+              "--method.project",
+              "{{$.inputs.parameters['project']}}",
+              "--method.location",
+              "{{$.inputs.parameters['location']}}",
+              "--method.display_name",
+              "{{$.inputs.parameters['display_name']}}",
+              "--method.gcs_source",
+              "{{$.inputs.parameters['gcs_source']}}",
+              "--method.labels",
+              "{{$.inputs.parameters['labels']}}",
+              "--executor_input",
+              "{{$}}",
+              "--resource_name_output_artifact_uri",
+              "{{$.outputs.artifacts['dataset'].uri}}"
+            ],
+            "command": [
+              "python3",
+              "-m",
+              "google_cloud_pipeline_components.container.aiplatform.remote_runner",
+              "--cls_name",
+              "TabularDataset",
+              "--method_name",
+              "create"
+            ],
+            "image": "gcr.io/ml-pipeline/google-cloud-pipeline-components:1.0.26"
+          }
+        }
+      }
+    },
+    "pipelineInfo": {
+      "name": "create-dataset-test"
+    },
+    "root": {
+      "dag": {
+        "tasks": {
+          "tabular-dataset-create": {
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-tabular-dataset-create"
+            },
+            "inputs": {
+              "parameters": {
+                "display_name": {
+                  "componentInputParameter": "DATASET_DISPLAY_NAME"
+                },
+                "gcs_source": {
+                  "componentInputParameter": "gcs_source"
+                },
+                "labels": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "{}"
+                    }
+                  }
+                },
+                "location": {
+                  "runtimeValue": {
+                    "constantValue": {
+                      "stringValue": "us-central1"
+                    }
+                  }
+                },
+                "project": {
+                  "componentInputParameter": "project"
+                }
+              }
+            },
+            "taskInfo": {
+              "name": "tabular-dataset-create"
+            }
+          }
+        }
+      },
+      "inputDefinitions": {
+        "parameters": {
+          "DATASET_DISPLAY_NAME": {
+            "type": "STRING"
+          },
+          "gcs_source": {
+            "type": "STRING"
+          },
+          "project": {
+            "type": "STRING"
+          }
+        }
+      }
+    },
+    "schemaVersion": "2.0.0",
+    "sdkVersion": "kfp-1.8.14"
+  },
+  "runtimeConfig": {
+    "gcsOutputDirectory": "gs://c4ds/vertexai/pipelines",
+    "parameters": {
+      "DATASET_DISPLAY_NAME": {
+        "stringValue": "stroke-dataset-from-pipeline"
+      },
+      "gcs_source": {
+        "stringValue": "gs://datasets-c4ds/healthcare-dataset-stroke-data.csv"
+      },
+      "project": {
+        "stringValue": "c4ds-gcp"
+      }
+    }
+  }
+}
